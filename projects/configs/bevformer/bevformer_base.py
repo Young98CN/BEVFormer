@@ -159,7 +159,7 @@ model = dict(
             iou_cost=dict(type='IoUCost', weight=0.0), # Fake cost. This is just to make it compatible with DETR head.
             pc_range=point_cloud_range))))
 
-dataset_type = 'CustomNuScenesDataset'
+dataset_type = 'CustomNuScenesDataset'  # 写了自定义的dataset，在这里面取了关键帧和非关键帧
 data_root = 'data/nuscenes/'
 file_client_args = dict(backend='disk')
 
