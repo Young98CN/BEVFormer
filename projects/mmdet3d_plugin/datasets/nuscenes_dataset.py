@@ -24,7 +24,7 @@ class CustomNuScenesDataset(NuScenesDataset):
 
     def __init__(self, queue_length=4, bev_size=(200, 200), overlap_test=False, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.queue_length = queue_length
+        self.queue_length = queue_length  # 默认的队列长度为4
         self.overlap_test = overlap_test
         self.bev_size = bev_size
         
@@ -39,10 +39,10 @@ class CustomNuScenesDataset(NuScenesDataset):
         queue = []
         index_list = list(range(index-self.queue_length, index))
         random.shuffle(index_list)
-        index_list = sorted(index_list[1:])
-        index_list.append(index)
+        index_list = sorted(index_list[1:])  # 选取前四帧中的随机三帧，然后排序
+        index_list.append(index)  # 拼接当前帧
         for i in index_list:
-            i = max(0, i)
+            i = max(0, i)  # 为了防止出现负数
             input_dict = self.get_data_info(i)
             if input_dict is None:
                 return None
@@ -63,14 +63,14 @@ class CustomNuScenesDataset(NuScenesDataset):
         prev_angle = None
         for i, each in enumerate(queue):
             metas_map[i] = each['img_metas'].data
-            if metas_map[i]['scene_token'] != prev_scene_token:
+            if metas_map[i]['scene_token'] != prev_scene_token:  # 记录不同的场景
                 metas_map[i]['prev_bev_exists'] = False
-                prev_scene_token = metas_map[i]['scene_token']
-                prev_pos = copy.deepcopy(metas_map[i]['can_bus'][:3])
-                prev_angle = copy.deepcopy(metas_map[i]['can_bus'][-1])
+                prev_scene_token = metas_map[i]['scene_token']  # 记录下场景token
+                prev_pos = copy.deepcopy(metas_map[i]['can_bus'][:3])  # 记录车辆pos
+                prev_angle = copy.deepcopy(metas_map[i]['can_bus'][-1])  # 记录车辆角度
                 metas_map[i]['can_bus'][:3] = 0
                 metas_map[i]['can_bus'][-1] = 0
-            else:
+            else:  # 记录相同的场景（0的时候）
                 metas_map[i]['prev_bev_exists'] = True
                 tmp_pos = copy.deepcopy(metas_map[i]['can_bus'][:3])
                 tmp_angle = copy.deepcopy(metas_map[i]['can_bus'][-1])
@@ -78,7 +78,7 @@ class CustomNuScenesDataset(NuScenesDataset):
                 metas_map[i]['can_bus'][-1] -= prev_angle
                 prev_pos = copy.deepcopy(tmp_pos)
                 prev_angle = copy.deepcopy(tmp_angle)
-        queue[-1]['img'] = DC(torch.stack(imgs_list), cpu_only=False, stack=True)
+        queue[-1]['img'] = DC(torch.stack(imgs_list), cpu_only=False, stack=True)  # 使用mmcv的封装
         queue[-1]['img_metas'] = DC(metas_map, cpu_only=True)
         queue = queue[-1]
         return queue

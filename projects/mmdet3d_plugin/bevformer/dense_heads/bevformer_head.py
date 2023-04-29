@@ -152,9 +152,9 @@ class BEVFormerHead(DETRHead):
 
         bev_mask = torch.zeros((bs, self.bev_h, self.bev_w),
                                device=bev_queries.device).to(dtype)
-        bev_pos = self.positional_encoding(bev_mask).to(dtype)
+        bev_pos = self.positional_encoding(bev_mask).to(dtype)  # sin cos emb
 
-        if only_bev:  # only use encoder to obtain BEV features, TODO: refine the workaround
+        if only_bev:  # only use encoder to obtain BEV features, TODO: refine the workaround   这个是用于计算上一帧BEV的
             return self.transformer.get_bev_features(
                 mlvl_feats,
                 bev_queries,

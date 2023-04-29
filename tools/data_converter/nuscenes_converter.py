@@ -151,7 +151,7 @@ def get_available_scenes(nusc):
     return available_scenes
 
 
-def _get_can_bus_info(nusc, nusc_can_bus, sample):
+def _get_can_bus_info(nusc, nusc_can_bus, sample):  # canbus 教程https://github.com/nutonomy/nuscenes-devkit/blob/master/python-sdk/nuscenes/can_bus/README.md
     scene_name = nusc.get('scene', sample['scene_token'])['name']
     sample_timestamp = sample['timestamp']
     try:
@@ -166,12 +166,12 @@ def _get_can_bus_info(nusc, nusc_can_bus, sample):
             break
         last_pose = pose
     _ = last_pose.pop('utime')  # useless
-    pos = last_pose.pop('pos')
-    rotation = last_pose.pop('orientation')
+    pos = last_pose.pop('pos')  # 全局坐标系中自车的位置，3
+    rotation = last_pose.pop('orientation')  # 自车坐标系下的旋转角度，4
     can_bus.extend(pos)
     can_bus.extend(rotation)
     for key in last_pose.keys():
-        can_bus.extend(pose[key])  # 16 elements
+        can_bus.extend(pose[key])  # 16 elements，顺序为pos，rotation，3维度加速度，3维角速度，3维度速度（除pos外其余都是在ego坐标系下）
     can_bus.extend([0., 0.])
     return np.array(can_bus)
 

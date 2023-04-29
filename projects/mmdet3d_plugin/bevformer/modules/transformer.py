@@ -130,7 +130,7 @@ class PerceptionTransformer(BaseModule):
         grid_length_x = grid_length[1]
         translation_length = np.sqrt(delta_x ** 2 + delta_y ** 2)
         translation_angle = np.arctan2(delta_y, delta_x) / np.pi * 180
-        bev_angle = ego_angle - translation_angle
+        bev_angle = ego_angle - translation_angle  # 计算车辆的朝向角度，所有的BEV都是以自车为中心生成，所以要对齐
         shift_y = translation_length * \
             np.cos(bev_angle / 180 * np.pi) / grid_length_y / bev_h
         shift_x = translation_length * \
